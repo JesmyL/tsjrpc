@@ -1,6 +1,6 @@
 {
   "name": "tsjrpc",
-  "version": "0.0.2",
+  "version": "0.0.20",
   "type": "module",
   "main": "./build/index.umd.cjs",
   "module": "./build/index.js",
@@ -22,7 +22,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "atomaric": "^0.0.1",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"
   }

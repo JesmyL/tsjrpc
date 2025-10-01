@@ -1,29 +1,21 @@
-import type { BaseOptions, MethodsLike } from './model';
+import type { BaseMakerConfig, BaseMethodsLike, BaseOptions, MethodCallbacks } from './base.model';
+import type { TSJRPCInvokeTranferDto } from './inner.model';
+import type { MethodOptions, MethodsConfig, MethodsMethodsLike, MethodsPack } from './methods.model';
 
-export type TSJRPCInvokeData = {
-  scope: string;
-  method: string;
-  args: object;
-  token?: string | nil;
+declare function makeTSJRPCBaseMaker<WithValueRet extends object | void, ToolParam = undefined, BeforeEachTool = void>(
+  options: BaseOptions<WithValueRet, ToolParam, BeforeEachTool>,
+): {
+  maker: new <M extends BaseMethodsLike>(
+    config: BaseMakerConfig<WithValueRet, M, ToolParam, BeforeEachTool>,
+  ) => MethodCallbacks<WithValueRet, M, ToolParam> & {
+    $$register: () => void;
+  };
+  next: (options: TSJRPCInvokeTranferDto<ToolParam>) => void;
 };
 
-export type TSJRPCInvokeTranferDto<Event extends TSJRPCEvent, Tool = undefined> = {
-  requestId: string;
-  invoke: TSJRPCInvokeData;
-  sendResponse: (event: Event, tool: Tool) => void;
-  tool: Tool;
-};
+declare function makeTSJRPCMethodsMaker<ToolParam = null>(
+  options: MethodOptions<ToolParam>,
+): new <M extends MethodsMethodsLike<ToolParam>>(config: MethodsConfig<M, ToolParam>) => MethodsPack<M, ToolParam>;
 
-export type TSJRPCEvent = {
-  requestId: string;
-  invokedResult?: unknown;
-  invoke?: TSJRPCInvokeData;
-  errorMessage?: string;
-  abort?: string;
-};
-
-declare function makeTSJRPCBaseMaker<ToolParam = undefined, FeedbackRet = void, BeforeEachTool = void>(
-  options: BaseOptions<ToolParam, FeedbackRet, BeforeEachTool>,
-): new <M extends MethodsLike>(config: Config<M>) => Methods<M> & { $$register: () => void };
-
-declare type makeTSJRPCMethodsMaker = makeTSJRPCMethodsMakerFunc;
+export * from './inner.model';
+export { makeTSJRPCBaseMaker, makeTSJRPCMethodsMaker };

@@ -1,38 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { TSJRPCInvokeData } from '../types/model';
+import type { TSJRPCInvokeData } from '../types/inner.model';
+import type { MethodsConfig, MethodsMethodsLike } from '../types/methods.model';
+import type { makeTSJRPCMethodsMaker as makeTSJRPCMethodsMakerFunc } from '../types/model';
 
 const registeredScopes = new Set<string>();
 
-export const makeTSJRPCMethodsMaker = <ToolParam = null>(options: {
+export const makeTSJRPCMethodsMaker: typeof makeTSJRPCMethodsMakerFunc = <ToolParam = null>(options: {
   isNeedCheckClassName: boolean;
   send: (data: TSJRPCInvokeData, tool: ToolParam) => Promise<unknown>;
 }) => {
-  const { isNeedCheckClassName, send } = options;
+  return function (this: unknown, { scope, methods }: MethodsConfig<MethodsMethodsLike<ToolParam>, ToolParam>) {
+    const self = this as MethodsMethodsLike<ToolParam>;
 
-  type Methods = Record<string, (args: any | void, tool: ToolParam) => unknown>;
-
-  type ResultListeners<M extends Methods> = {
-    [K in keyof M]: true | ((value: ReturnType<M[K]>) => void);
-  };
-
-  type RegisteredMethods<M extends Methods> = {
-    [K in keyof M]: (
-      args: Parameters<M[K]>[0] extends void ? void : Parameters<M[K]>[0],
-      tool: ToolParam,
-    ) => Promise<ReturnType<M[K]>>;
-  };
-
-  type Config<M extends Methods> = {
-    scope: string;
-    methods: ResultListeners<M>;
-  };
-  type Maker = new <M extends Methods>(config: Config<M>) => RegisteredMethods<M>;
-
-  return function (this: unknown, { scope, methods }: Config<Methods>) {
-    const self = this as Methods;
-
-    if (isNeedCheckClassName) {
+    if (options.isNeedCheckClassName) {
       if (registeredScopes.has(scope)) throw new Error(`The invoker class ${scope} was created again`);
       registeredScopes.add(scope);
     }
@@ -41,7 +22,7 @@ export const makeTSJRPCMethodsMaker = <ToolParam = null>(options: {
       self[method] = (args: any, tool: ToolParam) => {
         const { promise, reject, resolve } = Promise.withResolvers();
 
-        send({ scope, method, args }, tool).then(
+        options.send({ scope, method, args }, tool).then(
           methods[method] === true
             ? resolve
             : value => {
@@ -56,5 +37,5 @@ export const makeTSJRPCMethodsMaker = <ToolParam = null>(options: {
     });
 
     return this;
-  } as unknown as Maker;
+  } as never;
 };
