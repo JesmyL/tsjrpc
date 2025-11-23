@@ -10,7 +10,10 @@ export type MethodOptions<ToolParam = null> = {
 };
 
 type ResultListeners<M extends MethodsMethodsLike<ToolParam>, ToolParam> = {
-  [K in keyof M]: true | ((value: ReturnType<M[K]>) => void);
+  [K in keyof M]?: {
+    beforeSend?: (args: Parameters<M[K]>[0] extends void ? void : Parameters<M[K]>[0], tool: ToolParam) => void;
+    onResponse?: (value: ReturnType<M[K]>) => void;
+  };
 };
 
 export type MethodsConfig<M extends MethodsMethodsLike<ToolParam>, ToolParam> = {

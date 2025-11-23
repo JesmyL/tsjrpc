@@ -11,31 +11,29 @@ export const makeTSJRPCMethodsMaker: typeof makeTSJRPCMethodsMakerFunc = <ToolPa
   send: (data: TSJRPCInvokeData, tool: ToolParam) => Promise<unknown>;
 }) => {
   return function (this: unknown, { scope, methods }: MethodsConfig<MethodsMethodsLike<ToolParam>, ToolParam>) {
-    const self = this as MethodsMethodsLike<ToolParam>;
-
     if (options.isNeedCheckClassName) {
       if (registeredScopes.has(scope)) throw new Error(`The invoker class ${scope} was created again`);
       registeredScopes.add(scope);
     }
 
-    Object.keys(methods).forEach(method => {
-      self[method] = (args: any, tool: ToolParam) => {
-        const { promise, reject, resolve } = Promise.withResolvers();
+    return new Proxy(
+      {},
+      {
+        get: (_, method: string) => {
+          return (args: any, tool: ToolParam) => {
+            const { promise, reject, resolve } = Promise.withResolvers();
 
-        options.send({ scope, method, args }, tool).then(
-          methods[method] === true
-            ? resolve
-            : value => {
-                resolve(value);
-                (methods[method] as (value: unknown) => void)(value);
-              },
-          reject,
-        );
+            methods[method]?.beforeSend?.(args, tool);
 
-        return promise;
-      };
-    });
+            options.send({ scope, method, args }, tool).then(value => {
+              resolve(value);
+              methods[method]?.onResponse?.(value);
+            }, reject);
 
-    return this;
+            return promise;
+          };
+        },
+      },
+    );
   } as never;
 };

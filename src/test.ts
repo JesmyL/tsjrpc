@@ -7,7 +7,7 @@ const { maker: Base } = makeTSJRPCBaseMaker<{ ret: `${333}` }, { dadad: 123 }, {
   feedbackOnEach: () => {},
 });
 
-const Methods = makeTSJRPCMethodsMaker({
+const Methods = makeTSJRPCMethodsMaker<{ itIsTool: 4 }>({
   isNeedCheckClassName: false,
   send: async () => {},
 });
@@ -21,7 +21,10 @@ const methods = new (class A extends Methods<Methods> {
     super({
       scope: 'Scope',
       methods: {
-        add: async eqeq => eqeq,
+        add: {
+          beforeSend: (args, tool) => [args, tool],
+          onResponse: async eqeq => eqeq,
+        },
       },
     });
   }
@@ -38,6 +41,6 @@ const base = new (class A extends Base<Methods> {
   }
 })();
 
-methods.add({ qwe: 333 }, null);
+methods.add({ qwe: 333 }, { itIsTool: 4 });
 base.$$register();
 base.add({ qwe: 333 }, { dadad: 123 });
