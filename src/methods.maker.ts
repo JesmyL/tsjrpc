@@ -23,11 +23,11 @@ export const makeTSJRPCMethodsMaker: typeof makeTSJRPCMethodsMakerFunc = <ToolPa
           return async (args: any, tool: ToolParam) => {
             const { promise, reject, resolve } = Promise.withResolvers();
 
-            await methods[method]?.beforeSend?.(args, tool);
+            await methods?.[method]?.beforeSend?.(args, tool);
 
             options.send({ scope, method, args }, tool).then(value => {
               resolve(value);
-              methods[method]?.onResponse?.(value);
+              methods?.[method]?.onResponse?.(value);
             }, reject);
 
             return promise;

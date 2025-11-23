@@ -21,7 +21,7 @@ type ResultListeners<M extends MethodsMethodsLike<ToolParam>, ToolParam> = {
 
 export type MethodsConfig<M extends MethodsMethodsLike<ToolParam>, ToolParam> = {
   scope: string;
-  methods: ResultListeners<M, ToolParam>;
+  methods?: ResultListeners<M, ToolParam>;
 };
 
 export type MethodsPack<M extends MethodsMethodsLike<ToolParam>, ToolParam> = {
