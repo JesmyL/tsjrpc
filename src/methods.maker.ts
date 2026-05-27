@@ -12,7 +12,7 @@ export const makeTSJRPCMethodsMaker: typeof makeTSJRPCMethodsMakerFunc = <ToolPa
 }) => {
   return function (this: unknown, { scope, methods }: MethodsConfig<MethodsMethodsLike<ToolParam>, ToolParam>) {
     if (options.isNeedCheckClassName) {
-      if (registeredScopes.has(scope)) throw new Error(`The invoker class ${scope} was created again`);
+      if (registeredScopes.has(scope)) console.warn(`The invoker class ${scope} was created again`);
       registeredScopes.add(scope);
     }
 
