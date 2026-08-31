@@ -73,8 +73,8 @@ export const makeTSJRPCBaseMaker: typeof makeTSJRPCBaseMakerFunc = <
           feedbackOnEach?.({ invoke, tool: tool as never, feedback: feedback as never });
           sendResponse({ invokedResult: feedback, requestId }, tool);
         } catch (error) {
-          sendResponse({ errorMessage: '' + error, requestId }, tool);
-          onErrorMessage({ errorMessage: '' + error, invoke, tool: tool as never });
+          sendResponse({ error, requestId }, tool);
+          onErrorMessage({ error, invoke, tool: tool as never });
         }
       };
 

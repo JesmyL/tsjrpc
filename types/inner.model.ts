@@ -2,7 +2,7 @@ export type TSJRPCEvent = {
   requestId: string;
   invokedResult?: unknown;
   invoke?: TSJRPCInvokeData;
-  errorMessage?: string;
+  error?: unknown;
   abort?: string;
 };
 

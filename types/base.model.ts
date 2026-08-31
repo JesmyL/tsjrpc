@@ -8,7 +8,7 @@ export type BeforeEaches<BeforeEachTool, Methods extends object> = Partial<{ [K 
 
 export type BaseOptions<WithValueRet extends object | void, ToolParam = undefined, BeforeEachTool = void> = {
   feedbackOnEach?: (props: { feedback: WithValueRet; invoke: TSJRPCInvokeData; tool: ToolParam }) => void;
-  onErrorMessage: (props: { errorMessage: string; invoke: TSJRPCInvokeData; tool: ToolParam }) => void;
+  onErrorMessage: (props: { error: unknown; invoke: TSJRPCInvokeData; tool: ToolParam }) => void;
   beforeEach?: (props: {
     invoke: TSJRPCInvokeData;
     tool: ToolParam;
